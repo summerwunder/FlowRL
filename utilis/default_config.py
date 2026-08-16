@@ -3,17 +3,21 @@ from utilis.config import Config
 
 default_config = Config({
     "seed": 0,
-    "tag": "default",
+    "task": "humanoid-run",
+    "exp_name": "default",
+    "device": 0,
+    "epsilon": 0.0,
+    "lamda": 0.1,
+    "action_repeat": 1,
     "start_steps": 5000,
     "cuda": True,
-    "num_steps": 2000001,
+    "num_steps": 1000001,
     "save": True,
     
-    "env_name": "Walker2d-v4",  
     "eval": True,
     
-    "eval_numsteps": 10000,
-    "eval_times": 5,
+    "eval_numsteps": 20000,
+    "eval_times": 3,
     "replay_size": 1000000,
 
     "algo": "FlowAC",

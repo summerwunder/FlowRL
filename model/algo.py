@@ -32,7 +32,7 @@ import numpy as np
 CFM_MIN = 1e-3
 CFM_MAX = 1
 
-mode = "max-autotune"
+mode = "default"
 compile_model = True
 
 class flowAC(object):
@@ -157,7 +157,7 @@ class flowAC(object):
         self.scaler.step(self.V_critic_buffer_optim)
         self.scaler.update()
 
-        return q_buffer.detach().clone()
+        return q_buffer.detach()
         
 
     @torch.compile(mode=mode)
@@ -208,8 +208,10 @@ class flowAC(object):
         q_buffer = self.update_critic(
             state_batch, action_batch, reward_batch, next_state_batch, mask_batch
         )
-        
+
         if updates % self.target_update_interval == 0:
+            torch.compiler.cudagraph_mark_step_begin()
+            q_buffer = q_buffer.clone()
             self.update_policy(state_batch, action_batch, action_0, q_buffer)
             with torch.no_grad():
                 soft_update(self.critic_target, self.critic, self.tau)
@@ -221,7 +223,6 @@ class flowAC(object):
     # Save model parameters
     def save_checkpoint(self, path, i_episode):
         ckpt_path = path + '/' + '{}.torch'.format(i_episode)
-        print('Saving models to {}'.format(ckpt_path))
         torch.save({'policy_state_dict': self.policy.state_dict(),
                     'critic_state_dict': self.critic.state_dict(),
                     'critic_target_state_dict': self.critic_target.state_dict(),

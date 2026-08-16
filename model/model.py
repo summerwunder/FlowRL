@@ -123,7 +123,6 @@ class Policy_flow(nn.Module):
         return action_t
     
 
-    @torch.compile
     def sample(self, state):
         # sampel an action from the nomarl, mean = 0, std = 1
         time_start = torch.zeros(state.shape[0], 1, device = self.device)
@@ -141,7 +140,6 @@ class Policy_flow(nn.Module):
         action = action * self.action_scale + self.action_bias
         return action,0, action
 
-    @torch.compile    
     def sample_env(self, state):
         # sampel an action from the nomarl, mean = 0, std = 1
         time_start = torch.zeros(state.shape[0], 1, device=self.device)

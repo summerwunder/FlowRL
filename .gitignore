@@ -1,0 +1,39 @@
+# Python caches and local tooling
+__pycache__/
+*.py[cod]
+*$py.class
+.pytest_cache/
+.ruff_cache/
+.mypy_cache/
+.coverage
+htmlcov/
+
+# Virtual environments and local configuration
+.venv/
+venv/
+env/
+.env
+.env.*
+*.local
+
+# Experiment outputs
+results/*
+!results/RESULTS_INDEX.md
+outputs/
+logs/
+wandb/
+videos/
+checkpoints/
+*.pt
+*.pth
+*.ckpt
+*.npz
+*.npy
+*.pkl
+
+# Editor and operating-system files
+.idea/
+.vscode/
+.DS_Store
+*~
+*.swp

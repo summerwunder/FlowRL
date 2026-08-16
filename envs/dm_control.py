@@ -343,3 +343,44 @@ class DMControlEnv(gym.Env):
         return self._env.physics.render(
             height=height, width=width, camera_id=camera_id
         )
+
+
+class GymnasiumDMControlAdapter:
+    def __init__(self, env):
+        self.env = env
+        self.observation_space = env.observation_space
+        self.action_space = env.action_space
+        self.max_episode_steps = int(getattr(env, "_step_limit", 1000))
+        self.t = 0
+
+    def __getattr__(self, name):
+        return getattr(self.env, name)
+
+    def reset(self):
+        self.t = 0
+        return self.env.reset(), {}
+
+    def step(self, action):
+        self.t += 1
+        obs, reward, done, info = self.env.step(action)
+        truncated = self.t >= self.max_episode_steps
+        return obs, reward, done, truncated, info
+
+    def render(self, *args, **kwargs):
+        return self.env.render(*args, **kwargs)
+
+    def close(self):
+        if hasattr(self.env, "close"):
+            self.env.close()
+
+
+def make_env(cfg):
+    domain, task = cfg.task.replace("-", "_").split("_", 1)
+    domain = dict(cup="ball_in_cup", pointmass="point_mass").get(domain, domain)
+    env = DMControlEnv(
+        domain_name=domain,
+        task_name=task,
+        task_kwargs={"random": cfg.seed},
+        action_repeat=cfg.action_repeat,
+    )
+    return GymnasiumDMControlAdapter(env)
