@@ -2,8 +2,8 @@ from utilis.config import Config
 
 
 default_config = Config({
-    "seed": 0,
-    "task": "humanoid-run",
+    "seed": 1,
+    "task": "walker-run",
     "exp_name": "default",
     "device": 0,
     "epsilon": 0.0,
@@ -16,8 +16,8 @@ default_config = Config({
     
     "eval": True,
     
-    "eval_numsteps": 20000,
-    "eval_times": 3,
+    "eval_numsteps": 50000,
+    "eval_times": 5,
     "replay_size": 1000000,
 
     "algo": "FlowAC",

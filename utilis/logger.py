@@ -81,7 +81,10 @@ class Logger:
         return value
 
     def _write_csv(self, d, category):
-        if not self._save_csv:
+        if isinstance(self._save_csv, dict):
+            if not self._save_csv.get(category, True):
+                return
+        elif not self._save_csv:
             return
         row = {k: self._csv_value(v) for k, v in d.items()}
         self._csv.setdefault(category, []).append(row)

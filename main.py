@@ -88,7 +88,7 @@ def train_loop(config):
     with open(os.path.join(result_path, "config.log"), 'w') as f:
         f.write(str(config))
 
-    logger = Logger(result_path)
+    logger = Logger(result_path, save_csv={"train": False, "eval": True})
 
     # memory
     memory = ReplayMemory(config.replay_size, config.seed)
@@ -99,6 +99,13 @@ def train_loop(config):
     best_reward = -1e6
     start_time = time()
     ep_idx = 0
+
+    if config.eval is True:
+        avg_reward = evaluation(agent, env, total_numsteps, logger)
+        if avg_reward >= best_reward and config.save is True:
+            best_reward = avg_reward
+            agent.save_checkpoint(checkpoint_path, 'best')
+
     for _ in itertools.count(1):
         episode_reward = 0
         episode_steps = 0
