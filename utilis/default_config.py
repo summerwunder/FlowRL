@@ -2,8 +2,8 @@ from utilis.config import Config
 
 
 default_config = Config({
-    "seed": 1,
-    "task": "walker-run",
+    "seed": 2,
+    "task": "cheetah-run",
     "exp_name": "default",
     "device": 0,
     "epsilon": 0.0,

@@ -14,7 +14,7 @@ SEEDS_CSV=""
 TASKS_CSV=""
 DEVICE=""
 EXP_NAME="default"
-PYTHON_BIN="${PYTHON_BIN:-python3}"
+PYTHON_BIN="${PYTHON_BIN:-python}"
 RETRY_FAILED=1
 RETRY_DELAY=60
 EXTRA_ARGS=()
@@ -37,6 +37,7 @@ Options:
 
 Examples:
   bash scripts/run_dmc_tasks.sh
+  bash scripts/run_dmc_tasks.sh --seeds 1
   bash scripts/run_dmc_tasks.sh --seeds 3,4,5 --device 0
   bash scripts/run_dmc_tasks.sh --tasks walker-run,cheetah-run -- --lamda 0.1
 EOF
@@ -65,28 +66,41 @@ load_seed_group() {
 }
 
 TASKS=(
-    dog-stand
-    dog-walk
-    dog-trot
-    dog-run
-    humanoid-stand
-    humanoid-walk
-    humanoid-run
-    walker-stand
-    walker-walk
-    walker-run
-    hopper-stand
-    hopper-hop
-    quadruped-walk
-    quadruped-run
-    cheetah-run
+    # dog-stand
+    # dog-walk
+    # dog-trot
+    # dog-run
+    # humanoid-stand
+    # humanoid-walk
+    # humanoid-run
+    # cheetah-run
+    # walker-stand
+    # walker-walk
+    # walker-run
+    # hopper-stand
+    # hopper-hop
+    # quadruped-walk
+    # quadruped-run
+    # cheetah-run
     fish-swim
     finger-spin
-    cartpole-swingup
-    pendulum-swingup
     reacher-easy
-    cup-catch
+    reacher-hard
+    cartpole-balance
+    cartpole-swingup
 )
+
+use_short_task_schedule() {
+    local task="$1"
+    case "$task" in
+        finger-spin|reacher-easy|reacher-hard|cartpole-balance|cartpole-swingup|walker-stand|walker-walk)
+            return 0
+            ;;
+        *)
+            return 1
+            ;;
+    esac
+}
 
 while [[ $# -gt 0 ]]; do
     case "$1" in
@@ -149,6 +163,28 @@ if [[ -n "$TASKS_CSV" ]]; then
     csv_to_array "$TASKS_CSV" TASKS
 fi
 
+validate_tasks() {
+    "$PYTHON_BIN" - "${TASKS[@]}" <<'PY'
+import sys
+from dm_control import suite
+
+available = set(suite._get_tasks(tag=None))
+missing = []
+
+for cfg_task in sys.argv[1:]:
+    domain, task = cfg_task.replace("-", "_").split("_", 1)
+    domain = {"cup": "ball_in_cup", "pointmass": "point_mass"}.get(domain, domain)
+    if (domain, task) not in available:
+        missing.append(cfg_task)
+
+if missing:
+    print("Invalid DMC task(s): " + ", ".join(missing), file=sys.stderr)
+    sys.exit(1)
+PY
+}
+
+validate_tasks
+
 mkdir -p "$LOG_DIR"
 cd "$REPO_ROOT" || exit 1
 
@@ -172,6 +208,9 @@ run_one() {
 
     if [[ -n "$DEVICE" ]]; then
         cmd+=(--device "$DEVICE")
+    fi
+    if use_short_task_schedule "$task"; then
+        cmd+=(--num_steps 300000 --eval_numsteps 20000)
     fi
     if [[ ${#EXTRA_ARGS[@]} -gt 0 ]]; then
         cmd+=("${EXTRA_ARGS[@]}")

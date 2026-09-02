@@ -179,6 +179,8 @@ if __name__ == "__main__":
     arg.add_arg("epsilon", config.epsilon, "random noise for exploration")
     arg.add_arg("lamda", config.lamda, "lagrange_multiplier")
     arg.add_arg("action_repeat", config.action_repeat, "Action repeat for DMControl")
+    arg.add_arg("num_steps", config.num_steps, "Total environment steps")
+    arg.add_arg("eval_numsteps", config.eval_numsteps, "Evaluation interval in environment steps")
     arg.parser()
 
     config.update(arg)
