@@ -56,8 +56,8 @@ def evaluation(agent, env, total_numsteps, logger):
 
     logger.log({
         "step": total_numsteps,
-        "episode_reward": avg_reward,
-        "episode_success": avg_success,
+        "reward": avg_reward,
+        "seed": config.seed,
     }, "eval")
 
     return avg_reward
@@ -157,8 +157,8 @@ def train_loop(config):
         logger.log({
             "step": total_numsteps,
             "episode": ep_idx,
-            "episode_reward": episode_reward,
-            "episode_success": episode_success,
+            "reward": episode_reward,
+            "seed": config.seed,
             "total_time": time() - start_time,
         }, "train")
 

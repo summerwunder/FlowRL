@@ -8,8 +8,8 @@ from termcolor import colored
 CONSOLE_FORMAT = [
     ("step", "I", "int"),
     ("episode", "E", "int"),
-    ("episode_reward", "R", "float"),
-    ("episode_success", "S", "float"),
+    ("reward", "R", "float"),
+    ("seed", "S", "int"),
     ("total_time", "T", "time"),
 ]
 
